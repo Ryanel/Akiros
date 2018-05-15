@@ -1,0 +1,10 @@
+.vscode
+.gdbinit
+GPATH
+GRTAGS
+GTAGS
+
+*.o
+*.elf
+build/*
+iso/kernel
