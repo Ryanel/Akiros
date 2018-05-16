@@ -13,7 +13,6 @@
 using namespace Kernel;
 using namespace x86;
 
-GDT gdt;
 IDT idt;
 
 /// Configure the kernel
@@ -26,8 +25,8 @@ void kConfigureKernel() {
 void kInitHardware() {
     kLog.Info("kernel", "Initialising hardware");
 
-    gdt.Setup();
     idt.Setup();
+    
     asm("sti");
     
     kLog.Info("kernel", "Initialised hardware");

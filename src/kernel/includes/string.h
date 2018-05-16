@@ -3,6 +3,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+extern "C" {
+
 int strcmp (const char *str1,const char *str2);
 size_t strlen(const char *str);
 char * strcpy(char * dest, const char * src);
@@ -16,5 +18,7 @@ char * strpbrk(const char * str, const char * accept);
 size_t lfind(const char * str, const char accept);
 size_t strspn(const char * str, const char * accept);
 char * strtok_r(char * str, const char * delim, char ** saveptr);
+
+}
 
 #endif

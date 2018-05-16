@@ -36,7 +36,8 @@ BootPageDirectory:
     times (KERNEL_PAGE_NUMBER - 1) dd 0                 ; Pages before kernel space.
     ; This page directory entry defines a 4MB page containing the kernel.
     dd 0x00000083
-    times (1024 - KERNEL_PAGE_NUMBER - 1) dd 0  ; Pages after the kernel image.
+    dd 0x00010083
+    times (1024 - KERNEL_PAGE_NUMBER - 2) dd 0  ; Pages after the kernel image.
  
 ;===========================================================
 ; Stack
@@ -44,24 +45,35 @@ BootPageDirectory:
 section .bss
 align 16
 stack_bottom:
-resb 16384 ; 16 KiB
+resb 32384 ; 32 KB
 stack_top:
 
+section .bss
+global tls_bss_middle
+align 16
+tls_bss_bottom:
+resb 8192 ; 8 KB
+tls_bss_middle:
+resb 8192 ; 8 KB
+tls_bss_top:
+
 ;===========================================================
-; Queues
+; Code
 ;===========================================================
 section .text
 align 4
-
 
 extern kStart
 extern _init
 extern _fini
 
+extern gdt_size_minus_one
+extern gdt
+
 ; Function: _start
 global start
 start equ (_start - 0xC0000000)
- 
+
 global _start:function (_start.end - _start)
 _start:
     cli
@@ -89,15 +101,51 @@ _kernelInit:
 	mov dword [BootPageDirectory], 0 ; Unmap first page (4MB) of memory.
     invlpg [0] ; Refresh TLB
 
-	mov esp, stack_top ; Set stack
-
+    mov esp, stack_top ; Set stack
     push ebx ; Push Multiboot info structure -- physical address, may be unmapped 
 	push eax  ; Push multiboot magic number
+
+
+extern memset
+
+gdt_init:
+    ; Construct GDT pointer
+    sub esp, 6
+    mov eax, gdt_size_minus_one
+    mov [esp], eax
+    mov ecx, gdt
+    mov [esp + 2], ecx
+    lgdt [esp] ; Load GDT
+    add esp, 6
+
+    ; Set segment registers
+    mov ax, 0x28
+    mov fs, ax
+    mov ax, 0x30
+    mov gs, ax
+    mov ax, 0x10
+    mov ds, ax
+    mov es, ax
+    mov ss, ax
+
+    ; Clear tls with memset
+    push dword 16384
+    push dword 0
+    push dword tls_bss_bottom
+
+    call memset 
+
+    add esp, 12
+
+    ; Setup TLS
+    mov dword [tls_bss_middle], tls_bss_middle
+
+init_kernel:
 
 	call _init ; Init kernel Global Constructors
 	call kStart ; Start kernel
 	call _fini ; At this point, we're shutting down the kernel. Call deconstructors.
-
+    call kHang
 
 ; Function: kHang
 global kHang:function (kHang.end - kHang)

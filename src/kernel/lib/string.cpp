@@ -2,6 +2,8 @@
 #include <stdint.h>
 #include <string.h>
 
+extern "C" {
+
 void *memcpy(void *dest,const void *src,size_t n) {
 	volatile uint32_t num_dwords = n/4;
 	volatile uint32_t num_bytes = n%4;
@@ -19,6 +21,7 @@ void *memcpy(void *dest,const void *src,size_t n) {
 	}
 	return dest;
 }
+
 void *memset(void *dest,int val,size_t n) {
 	volatile uint32_t num_dwords = n/4;
 	volatile uint32_t num_bytes = n%4;
@@ -36,6 +39,7 @@ void *memset(void *dest,int val,size_t n) {
 	}
   return dest;
 }
+
 
 void memmove(void *dest, const void *src, size_t n)
 {
@@ -159,4 +163,5 @@ size_t lfind(const char * str, const char accept)
 		i++;
 	}
 	return (size_t)(str) + i;
+}
 }

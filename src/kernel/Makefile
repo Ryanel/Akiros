@@ -10,17 +10,20 @@ CXX := i686-elf-g++
 else
 CXX := ${COMPILE_PREFIX}-g++
 endif
-ASM := nasm -felf32
+ASM := nasm -felf32 -g 
+
+GENISO 	:= genisoimage
+GENISOF	:= -R -b boot/grub/stage2_eltorito -quiet -no-emul-boot -boot-load-size 4 -boot-info-table
 
 # Flags
-CXXFLAGS := -g -ffreestanding -nostartfiles -std=gnu++14 -fno-rtti -fno-exceptions -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -Wall -Wextra -O2 -I includes ${CXXFLAGS}
-LDFLAGS := ${CXXFLAGS} -mcmodel=large -z max-page-size=0x1000 -nostdlib 
-LDAFTERFLAGS := -lgcc
+CXXFLAGS 		 := -g -nostdlib -fstack-protector -ffreestanding -nostartfiles -std=gnu++11 -fno-rtti -fno-exceptions -Wall -Wextra -O2 -I includes ${CXXFLAGS}
+LDFLAGS 		 := ${CXXFLAGS} -nostdlib 
+LDAFTERFLAGS 	 := -lgcc
 
 # Cached variables
 LD_LINKER_SCRIPT := ${ARCH}/${BOARD}/link.ld
 
-# Files
+# Files 
 FILES_KERNEL 	 := $(patsubst %.cpp,%.o,$(wildcard *.cpp))
 FILES_LIB    	 := $(patsubst %.cpp,%.o,$(wildcard lib/*.cpp))
 FILES_ARCH   	 := $(patsubst %.cpp,%.o,$(wildcard ${ARCH}/*.cpp)) $(patsubst %.asm,%.o,$(wildcard ${ARCH}/*.asm))
