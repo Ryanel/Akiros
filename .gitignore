@@ -5,6 +5,7 @@ GRTAGS
 GTAGS
 
 *.o
+*.d
 *.elf
 build/*
 iso/kernel
