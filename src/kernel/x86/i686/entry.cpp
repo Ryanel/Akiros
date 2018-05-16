@@ -4,11 +4,17 @@
 #include <console/console.hpp>
 
 #include <multiboot.hpp>
-#include <x86/textmode.hpp>
 #include <klog.hpp>
+
+#include <x86/textmode.hpp>
+#include <x86/gdt.hpp>
+#include <x86/idt.hpp>
 
 using namespace Kernel;
 using namespace x86;
+
+GDT gdt;
+IDT idt;
 
 /// Configure the kernel
 void kConfigureKernel() {
@@ -18,7 +24,13 @@ void kConfigureKernel() {
 
 /// Initialise the hardware
 void kInitHardware() {
-    kLog.Debug("kernel", "Initialising hardware");
+    kLog.Info("kernel", "Initialising hardware");
+
+    gdt.Setup();
+    idt.Setup();
+    asm("sti");
+    
+    kLog.Info("kernel", "Initialised hardware");
 }
 
 /// Start of execution
