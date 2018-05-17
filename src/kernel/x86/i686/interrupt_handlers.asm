@@ -257,11 +257,16 @@ isr_common_stub:
     push es
     push fs
     push gs
+
+    mov ax, 0x28
+    mov fs, ax
+    mov ax, 0x30
+    mov gs, ax
     mov ax, 0x10
     mov ds, ax
     mov es, ax
-    mov fs, ax
-    mov gs, ax
+    mov ss, ax
+    
     mov eax, esp
     push eax
     mov eax, x86_interrupt_fault_handler
@@ -414,12 +419,14 @@ irq_common_stub:
     push fs
     push gs
 
+    mov ax, 0x28
+    mov fs, ax
+    mov ax, 0x30
+    mov gs, ax
     mov ax, 0x10
     mov ds, ax
     mov es, ax
-    mov fs, ax
-    mov gs, ax
-    mov eax, esp
+    mov ss, ax
 
     push eax
     mov eax, x86_interrupt_irq_handler

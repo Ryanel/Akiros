@@ -13,7 +13,7 @@ endif
 ASM := nasm -felf32
 
 # Flags
-CXXFLAGS := -g -ffreestanding -nostartfiles -fstack-protector-strong -std=gnu++14 -fno-rtti -fno-exceptions -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -Wall -Wextra -O2 -I includes ${CXXFLAGS}
+CXXFLAGS := -g -ffreestanding -nostartfiles -fstack-protector-strong -std=gnu++14 -fno-rtti -fno-exceptions -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -Wall -Wextra -Og -I includes ${CXXFLAGS}
 LDFLAGS := ${CXXFLAGS} -mcmodel=large -z max-page-size=0x1000 -nostdlib 
 LDAFTERFLAGS := -lgcc
 

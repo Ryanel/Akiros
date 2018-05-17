@@ -9,6 +9,7 @@
 #include <x86/textmode.hpp>
 #include <x86/gdt.hpp>
 #include <x86/idt.hpp>
+#include <x86/interrupts.hpp>
 
 using namespace Kernel;
 using namespace x86;
@@ -26,14 +27,13 @@ void kInitHardware() {
     kLog.Info("kernel", "Initialising hardware");
 
     idt.Setup();
-    asm("sti");
-    
+    x86::EnableInterrupts(true);
+
     kLog.Info("kernel", "Initialised hardware");
 }
 
 /// Start of execution
-extern "C" void kStart(uint32_t mbMagic, void * mbt) {
-    
+extern "C" void kStart(uint32_t mbMagic, void * mbt) { 
     UNUSED(mbMagic);
     UNUSED(mbt);
     

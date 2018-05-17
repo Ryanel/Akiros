@@ -45,6 +45,16 @@ const char *exception_messages[] =
 	"Reserved"
 };
 
+namespace x86 {
+void EnableInterrupts(bool on) {
+	if(on) {
+		asm("sti");
+	} else {
+		asm("cli");
+	}
+}
+}
+
 extern "C" void x86_interrupt_fault_handler(registers_t * r) {
     kLog.Fatal("fault", "========= Started Kernel Fault Handler =======");
     kLog.Fatal("fault", "num: %d (error %d, %s)",r->int_no,r->err_code,exception_messages[r->int_no]);
