@@ -4,23 +4,26 @@
 using namespace x86;
 using namespace Kernel;
 
+struct GDT::gdt_ptr gdtptr;
+GDT gdt;
+
+extern "C" uintptr_t tls_bss_middle;
+
+extern "C" void GDT_DoSetup() {
+    gdt.Setup();
+}
 
 void GDT::Setup() {
-    #ifdef ARCH_64Bit
-    return; // Do not setup GDT, it's already setup by the loader.
-    #endif
-
     gdtptr.limit = (sizeof(struct gdt_entry) * numEntries) - 1;
     gdtptr.base = (uint32_t)&gdt;
 
     SetGate(0, 0, 0, 0, 0);                // Null segment
-	SetGate(1, 0, 0xFFFFFFFF, 0x9A, 0xCF); // Code segment
-	SetGate(2, 0, 0xFFFFFFFF, 0x92, 0xCF); // Data segment
-	SetGate(3, 0, 0xFFFFFFFF, 0xFA, 0xCF); // User mode code segment
+    SetGate(1, 0, 0xFFFFFFFF, 0x9A, 0xCF); // Code segment
+    SetGate(2, 0, 0xFFFFFFFF, 0x92, 0xCF); // Data segment
+    SetGate(3, 0, 0xFFFFFFFF, 0xFA, 0xCF); // User mode code segment
     SetGate(4, 0, 0xFFFFFFFF, 0xF2, 0xCF); // User mode data segment
-
-    gdt_flush((uintptr_t)&gdtptr);
-	kLog.Log(LOG_DEBUG, "x86", "GDT configured");
+    SetGate(5, (uint32_t)&tls_bss_middle, 0xFFFFFFFF, 0x93, 0xCF); // GS TLS segment
+    SetGate(6, (uint32_t)&tls_bss_middle, 0xFFFFFFFF, 0x93, 0xCF); // FS TLS segment
 }
 
 void GDT::SetGate(signed int num, uint32_t base, uint32_t limit, uint8_t access, uint8_t gran) {

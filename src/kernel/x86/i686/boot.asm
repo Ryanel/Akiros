@@ -46,6 +46,15 @@ align 16
 stack_bottom:
 resb 16384 ; 16 KiB
 stack_top:
+global tls_bss_bottom
+global tls_bss_middle
+global tls_bss_top
+align 16
+tls_bss_bottom:
+resb 8192 ; 8 KB
+tls_bss_middle:
+resb 8192 ; 8 KB
+tls_bss_top:
 
 ;===========================================================
 ; Queues
@@ -57,10 +66,10 @@ extern kStart
 extern _init
 extern _fini
 
+extern setupGDT
+extern setupTLS
+
 ; Function: _start
-global start
-start equ (_start - 0xC0000000)
- 
 global _start:function (_start.end - _start)
 _start:
     cli
@@ -80,11 +89,12 @@ _start:
     ; Since eip at this point holds the physical address of this command (approximately 0x00100000)
     ; we need to do a long jump to the correct virtual address of StartInHigherHalf which is
     ; approximately 0xC0100000.
-    lea ecx, [_kernelInit]
+    lea ecx, [kernelInit]
     jmp ecx                                                     ; NOTE: Must be absolute jump!
 .end:
 
-_kernelInit:
+global kernelInit:function (kernelInit.end - kernelInit)
+kernelInit:
 	mov dword [BootPageDirectory], 0 ; Unmap first page (4MB) of memory.
     invlpg [0] ; Refresh TLB
 
@@ -93,9 +103,14 @@ _kernelInit:
     push ebx ; Push Multiboot info structure -- physical address, may be unmapped 
 	push eax  ; Push multiboot magic number
 
+    call setupGDT
+    call setupTLS
+
 	call _init ; Init kernel Global Constructors
 	call kStart ; Start kernel
 	call _fini ; At this point, we're shutting down the kernel. Call deconstructors.
+.end:
+
 
 
 ; Function: kHang

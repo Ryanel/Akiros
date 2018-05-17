@@ -1,7 +1,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
-
+extern "C" {
 void *memcpy(void *dest,const void *src,size_t n) {
 	volatile uint32_t num_dwords = n/4;
 	volatile uint32_t num_bytes = n%4;
@@ -159,4 +159,5 @@ size_t lfind(const char * str, const char accept)
 		i++;
 	}
 	return (size_t)(str) + i;
+}
 }

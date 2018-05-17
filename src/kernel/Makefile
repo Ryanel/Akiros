@@ -13,7 +13,7 @@ endif
 ASM := nasm -felf32
 
 # Flags
-CXXFLAGS := -g -ffreestanding -nostartfiles -std=gnu++14 -fno-rtti -fno-exceptions -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -Wall -Wextra -O2 -I includes ${CXXFLAGS}
+CXXFLAGS := -g -ffreestanding -nostartfiles -fstack-protector-strong -std=gnu++14 -fno-rtti -fno-exceptions -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -Wall -Wextra -O2 -I includes ${CXXFLAGS}
 LDFLAGS := ${CXXFLAGS} -mcmodel=large -z max-page-size=0x1000 -nostdlib 
 LDAFTERFLAGS := -lgcc
 
@@ -49,7 +49,7 @@ distclean: clean
 
 run: 
 	@echo "[RUN] ${OUTPUT_DIRECTORY}${KERNEL_OUTPUT}"
-	@qemu-system-i386 -m 32M -kernel ${OUTPUT_DIRECTORY}/${KERNEL_OUTPUT}
+	@qemu-system-i386 -m 32M -s -kernel ${OUTPUT_DIRECTORY}/${KERNEL_OUTPUT}
 
 # Build rules
 %.o: %.asm	
@@ -59,3 +59,7 @@ run:
 %.o: %.cpp
 	@echo "[CXX]:" $@
 	@${CXX} -c ${CXXFLAGS} -o $@ $<
+	
+#%.o: %.cpp
+#	@echo "[CXX]:" $@
+#	@${CXX} -c ${CXXFLAGS} -fno-stack-protector -o $@ $<
