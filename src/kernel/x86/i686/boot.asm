@@ -53,7 +53,6 @@ stack_top:
 section .text
 align 4
 
-
 extern kStart
 extern _init
 extern _fini
