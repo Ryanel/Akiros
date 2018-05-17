@@ -50,11 +50,22 @@ struct gdt_entry gdt[] =
 	GDT_ENTRY(0, 0xFFFFFFFF, 0xF2, GRAN_32_BIT_MODE | GRAN_4KIB_BLOCKS),
 
 	/* 0x28: F Segment. */
-	GDT_ENTRY((uintptr_t)&tls_bss_middle, 0xFFFFFFFF, 0x93, GRAN_32_BIT_MODE | GRAN_4KIB_BLOCKS),
+	GDT_ENTRY((uint32_t)&tls_bss_middle, 0xFFFFFFFF, 0x93, GRAN_32_BIT_MODE | GRAN_4KIB_BLOCKS),
 
 	/* 0x30: G Segment. */
-	GDT_ENTRY((uintptr_t)&tls_bss_middle, 0xFFFFFFFF, 0x93, GRAN_32_BIT_MODE | GRAN_4KIB_BLOCKS),
+	GDT_ENTRY((uint32_t)&tls_bss_middle, 0xFFFFFFFF, 0x93, GRAN_32_BIT_MODE | GRAN_4KIB_BLOCKS),
 };
+
+void setup_gdt() {
+
+	// FIXME: Workaround. Compiler will not use tls_bss_middle during boot for some reason! Initialising it manually helps.
+
+	/* 0x28: F Segment. */
+	gdt[5] = GDT_ENTRY((uint32_t)&tls_bss_middle, 0xFFFFFFFF, 0x93, GRAN_32_BIT_MODE | GRAN_4KIB_BLOCKS);
+
+	/* 0x30: G Segment. */
+	gdt[6] = GDT_ENTRY((uint32_t)&tls_bss_middle, 0xFFFFFFFF, 0x93, GRAN_32_BIT_MODE | GRAN_4KIB_BLOCKS);
+}
 
 uint16_t gdt_size_minus_one = sizeof(gdt) - 1;
 }

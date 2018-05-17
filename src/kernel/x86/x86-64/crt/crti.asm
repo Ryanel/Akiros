@@ -1,9 +1,11 @@
+bits 64
 section .init
 global _init:function
 _init:
     push rbp
     mov rbp, rsp
 
+bits 64
 section .fini
 global _fini:function
 _fini:

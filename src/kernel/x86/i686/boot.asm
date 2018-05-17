@@ -107,8 +107,11 @@ _kernelInit:
 
 
 extern memset
-
+extern setup_gdt
 gdt_init:
+
+    call setup_gdt
+
     ; Construct GDT pointer
     sub esp, 6
     mov eax, gdt_size_minus_one
@@ -127,7 +130,10 @@ gdt_init:
     mov ds, ax
     mov es, ax
     mov ss, ax
-
+    jmp 0x08:.flush
+.flush:
+    ;hlt
+ 
     ; Clear tls with memset
     push dword 16384
     push dword 0

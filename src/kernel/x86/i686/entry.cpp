@@ -14,7 +14,7 @@ using namespace Kernel;
 using namespace x86;
 
 IDT idt;
-
+extern "C" uintptr_t tls_bss_middle;
 /// Configure the kernel
 void kConfigureKernel() {
     console.SetBase(&x86::textModeBase);
@@ -41,7 +41,7 @@ extern "C" void kStart(uint32_t mbMagic, void * mbt) {
     kConfigureKernel();
     
     Multiboot::Verify(mbMagic);
-
+    kLog.Info("kernel", "tls_bss_middle: 0x%X", tls_bss_middle);
     kInitHardware();
     
     kMain();

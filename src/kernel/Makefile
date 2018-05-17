@@ -16,8 +16,8 @@ GENISO 	:= genisoimage
 GENISOF	:= -R -b boot/grub/stage2_eltorito -quiet -no-emul-boot -boot-load-size 4 -boot-info-table
 
 # Flags
-CXXFLAGS 		 := -g -nostdlib -fstack-protector -ffreestanding -nostartfiles -std=gnu++11 -fno-rtti -fno-exceptions -Wall -Wextra -O2 -I includes ${CXXFLAGS}
-LDFLAGS 		 := ${CXXFLAGS} -nostdlib 
+CXXFLAGS 		 := -g -nostdlib -fstack-protector-strong -ffreestanding -nostartfiles -std=gnu++11 -fno-rtti -fno-exceptions -Wall -Wextra -O2 -I includes ${CXXFLAGS}
+LDFLAGS 		 := ${CXXFLAGS} -nostdlib # -Wl,--orphan-handling,warn
 LDAFTERFLAGS 	 := -lgcc
 
 # Cached variables
