@@ -1,263 +1,36 @@
-global isr0
-global isr1
-global isr2
-global isr3
-global isr4
-global isr5
-global isr6
-global isr7
-global isr8
-global isr9
-global isr10
-global isr11
-global isr12
-global isr13
-global isr14
-global isr15
-global isr16
-global isr17
-global isr18
-global isr19
-global isr20
-global isr21
-global isr22
-global isr23
-global isr24
-global isr25
-global isr26
-global isr27
-global isr28
-global isr29
-global isr30
-global isr31
-
-;  0: Divide By Zero Exception
-isr0:
-    cli
-    push byte 0
-    push byte 0
-    jmp isr_common_stub
-
-;  1: Debug Exception
-isr1:
-    cli
-    push byte 0
-    push byte 1
-    jmp isr_common_stub
-
-;  2: Non Maskable Interrupt Exception
-isr2:
-    cli
-    push byte 0
-    push byte 2
-    jmp isr_common_stub
-
-;  3: Int 3 Exception
-isr3:
-    cli
-    push byte 0
-    push byte 3
-    jmp isr_common_stub
-
-;  4: INTO Exception
-isr4:
-    cli
-    push byte 0
-    push byte 4
-    jmp isr_common_stub
-
-;  5: Out of Bounds Exception
-isr5:
-    cli
-    push byte 0
-    push byte 5
-    jmp isr_common_stub
-
-;  6: Invalid Opcode Exception
-isr6:
-    cli
-    push byte 0
-    push byte 6
-    jmp isr_common_stub
-
-;  7: Coprocessor Not Available Exception
-isr7:
-    cli
-    push byte 0
-    push byte 7
-    jmp isr_common_stub
-
-;  8: Double Fault Exception (With Error Code!)
-isr8:
-    cli
-    push byte 8
-    jmp isr_common_stub
-
-;  9: Coprocessor Segment Overrun Exception
-isr9:
-    cli
-    push byte 0
-    push byte 9
-    jmp isr_common_stub
-
-; 10: Bad TSS Exception (With Error Code!)
-isr10:
-    cli
-    push byte 10
-    jmp isr_common_stub
-
-; 11: Segment Not Present Exception (With Error Code!)
-isr11:
-    cli
-    push byte 11
-    jmp isr_common_stub
-
-; 12: Stack Fault Exception (With Error Code!)
-isr12:
-    cli
-    push byte 12
-    jmp isr_common_stub
-
-; 13: General Protection Fault Exception (With Error Code!)
-isr13:
-    cli
-    push byte 13
-    jmp isr_common_stub
-
-; 14: Page Fault Exception (With Error Code!)
-isr14:
-    cli
-    push byte 14
-    jmp isr_common_stub
-
-; 15: Reserved Exception
-isr15:
-    cli
-    push byte 0
-    push byte 15
-    jmp isr_common_stub
-
-; 16: Floating Point Exception
-isr16:
-    cli
-    push byte 0
-    push byte 16
-    jmp isr_common_stub
-
-; 17: Alignment Check Exception
-isr17:
-    cli
-    push byte 0
-    push byte 17
-    jmp isr_common_stub
-
-; 18: Machine Check Exception
-isr18:
-    cli
-    push byte 0
-    push byte 18
-    jmp isr_common_stub
-
-; 19: Reserved
-isr19:
-    cli
-    push byte 0
-    push byte 19
-    jmp isr_common_stub
-
-; 20: Reserved
-isr20:
-    cli
-    push byte 0
-    push byte 20
-    jmp isr_common_stub
-
-; 21: Reserved
-isr21:
-    cli
-    push byte 0
-    push byte 21
-    jmp isr_common_stub
-
-; 22: Reserved
-isr22:
-    cli
-    push byte 0
-    push byte 22
-    jmp isr_common_stub
-
-; 23: Reserved
-isr23:
-    cli
-    push byte 0
-    push byte 23
-    jmp isr_common_stub
-
-; 24: Reserved
-isr24:
-    cli
-    push byte 0
-    push byte 24
-    jmp isr_common_stub
-
-; 25: Reserved
-isr25:
-    cli
-    push byte 0
-    push byte 25
-    jmp isr_common_stub
-
-; 26: Reserved
-isr26:
-    cli
-    push byte 0
-    push byte 26
-    jmp isr_common_stub
-
-; 27: Reserved
-isr27:
-    cli
-    push byte 0
-    push byte 27
-    jmp isr_common_stub
-
-; 28: Reserved
-isr28:
-    cli
-    push byte 0
-    push byte 28
-    jmp isr_common_stub
-
-; 29: Reserved
-isr29:
-    cli
-    push byte 0
-    push byte 29
-    jmp isr_common_stub
-
-; 30: Reserved
-isr30:
-    cli
-    push byte 0
-    push byte 30
-    jmp isr_common_stub
-
-; 31: Reserved
-isr31:
-    cli
-    push byte 0
-    push byte 31
-    jmp isr_common_stub
-
+;-------------------------------------------
+; Interrupt handlers.
+;-------------------------------------------
 extern x86_interrupt_fault_handler
+extern x86_interrupt_irq_handler
 
-isr_common_stub:
-    pusha
-    push ds
-    push es
-    push fs
-    push gs
+%macro defineISR 1
+global isr%1
+isr%1:
+    cli
+    push byte 0
+    push byte %1
+    jmp isr_common_stub
+%endmacro
 
+%macro defineISRE 1
+global isr%1
+isr%1:
+    cli
+    push byte %1
+    jmp isr_common_stub
+%endmacro
+
+%macro defineIRQ 2
+global irq%1
+irq%1:
+    cli
+    push byte 0
+    push byte %2
+    jmp irq_common_stub
+%endmacro
+
+%macro setupSegment 0
     mov ax, 0x28
     mov fs, ax
     mov ax, 0x30
@@ -266,12 +39,72 @@ isr_common_stub:
     mov ds, ax
     mov es, ax
     mov ss, ax
-    
+%endmacro
+
+defineISR 0     ;  0: Divide By Zero Exception
+defineISR 1     ;  1: Debug Exception
+defineISR 2     ;  2: Non Maskable Interrupt Exception
+defineISR 3     ;  3: Int 3 Exception
+defineISR 4     ;  4: INTO Exception
+defineISR 5     ;  5: Out of Bounds Exception
+defineISR 6     ;  6: Invalid Opcode Exception
+defineISR 7     ;  7: Coprocessor Not Available Exception
+defineISRE 8    ;  8: Double Fault Exception
+defineISR 9     ;  9: Coprocessor Segment Overrun Exception
+defineISRE 10   ; 10: Bad TSS Exception
+defineISRE 11   ; 11: Segment Not Present Exception
+defineISRE 12   ; 12: Stack Fault Exception
+defineISRE 13   ; 13: General Protection Fault Exception
+defineISRE 14   ; 14: Page Fault Exception
+defineISR 15    ; 15: Reserved Exception
+defineISR 16    ; 16: Floating Point Exception
+defineISR 17    ; 17: Alignment Check Exception
+defineISR 18    ; 18: Machine Check Exception
+defineISR 19    ; 19: Reserved
+defineISR 20    ; 20: Reserved
+defineISR 21    ; 21: Reserved
+defineISR 22    ; 22: Reserved
+defineISR 23    ; 23: Reserved
+defineISR 24    ; 24: Reserved
+defineISR 25    ; 25: Reserved
+defineISR 26    ; 26: Reserved
+defineISR 27    ; 27: Reserved
+defineISR 28    ; 28: Reserved
+defineISR 29    ; 29: Reserved
+defineISR 30    ; 30: Reserved
+defineISR 31    ; 31: Reserved
+defineIRQ 0,32  ; 32: IRQ0
+defineIRQ 1,33  ; 33: IRQ1
+defineIRQ 2,34  ; 34: IRQ2
+defineIRQ 3,35  ; 35: IRQ3
+defineIRQ 4,36  ; 36: IRQ4
+defineIRQ 5,37  ; 37: IRQ5
+defineIRQ 6,38  ; 38: IRQ6
+defineIRQ 7,39  ; 39: IRQ7
+defineIRQ 8,40  ; 40: IRQ8
+defineIRQ 9,41  ; 41: IRQ9
+defineIRQ 10,42 ; 42: IRQ10
+defineIRQ 11,43 ; 43: IRQ11
+defineIRQ 12,44 ; 44: IRQ12
+defineIRQ 13,45 ; 45: IRQ13
+defineIRQ 14,46 ; 46: IRQ14
+defineIRQ 15,47 ; 47: IRQ15
+ 
+isr_common_stub:
+    pusha
+    push ds
+    push es
+    push fs
+    push gs
+
+    setupSegment
+
     mov eax, esp
     push eax
     mov eax, x86_interrupt_fault_handler
     call eax
     pop eax
+    
     pop gs
     pop fs
     pop es
@@ -280,138 +113,6 @@ isr_common_stub:
     add esp, 8
     iret
 
-
-global irq0
-global irq1
-global irq2
-global irq3
-global irq4
-global irq5
-global irq6
-global irq7
-global irq8
-global irq9
-global irq10
-global irq11
-global irq12
-global irq13
-global irq14
-global irq15
-
-; 32: IRQ0
-irq0:
-    cli
-    push byte 0
-    push byte 32
-    jmp irq_common_stub
-
-; 33: IRQ1
-irq1:
-    cli
-    push byte 0
-    push byte 33
-    jmp irq_common_stub
-
-; 34: IRQ2
-irq2:
-    cli
-    push byte 0
-    push byte 34
-    jmp irq_common_stub
-
-; 35: IRQ3
-irq3:
-    cli
-    push byte 0
-    push byte 35
-    jmp irq_common_stub
-
-; 36: IRQ4
-irq4:
-    cli
-    push byte 0
-    push byte 36
-    jmp irq_common_stub
-
-; 37: IRQ5
-irq5:
-    cli
-    push byte 0
-    push byte 37
-    jmp irq_common_stub
-
-; 38: IRQ6
-irq6:
-    cli
-    push byte 0
-    push byte 38
-    jmp irq_common_stub
-
-; 39: IRQ7
-irq7:
-    cli
-    push byte 0
-    push byte 39
-    jmp irq_common_stub
-
-; 40: IRQ8
-irq8:
-    cli
-    push byte 0
-    push byte 40
-    jmp irq_common_stub
-
-; 41: IRQ9
-irq9:
-    cli
-    push byte 0
-    push byte 41
-    jmp irq_common_stub
-
-; 42: IRQ10
-irq10:
-    cli
-    push byte 0
-    push byte 42
-    jmp irq_common_stub
-
-; 43: IRQ11
-irq11:
-    cli
-    push byte 0
-    push byte 43
-    jmp irq_common_stub
-
-; 44: IRQ12
-irq12:
-    cli
-    push byte 0
-    push byte 44
-    jmp irq_common_stub
-
-; 45: IRQ13
-irq13:
-    cli
-    push byte 0
-    push byte 45
-    jmp irq_common_stub
-
-; 46: IRQ14
-irq14:
-    cli
-    push byte 0
-    push byte 46
-    jmp irq_common_stub
-
-; 47: IRQ15
-irq15:
-    cli
-    push byte 0
-    push byte 47
-    jmp irq_common_stub
-
-extern x86_interrupt_irq_handler
-
 irq_common_stub:
     pusha
     push ds
@@ -419,14 +120,7 @@ irq_common_stub:
     push fs
     push gs
 
-    mov ax, 0x28
-    mov fs, ax
-    mov ax, 0x30
-    mov gs, ax
-    mov ax, 0x10
-    mov ds, ax
-    mov es, ax
-    mov ss, ax
+    setupSegment
 
     push eax
     mov eax, x86_interrupt_irq_handler
