@@ -4,7 +4,9 @@
 
 using namespace Kernel;
 
-void panic(const char * msg) {
+[[ noreturn ]] void panic(const char * msg) {
     kLog.Fatal("panic", msg);
-    kHang();
+    while(true) {
+        kHang();
+    }
 }
