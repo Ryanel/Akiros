@@ -1,10 +1,12 @@
 #include <x86/registers.hpp>
 #include <x86/ports.hpp>
+#include <x86/interrupts.hpp>
+
 #include <klog.hpp>
 #include <panic.hpp>
 
 using namespace Kernel;
-//using namespace x86;
+using namespace x86;
 
 const char *exception_messages[] =
 {
@@ -69,6 +71,11 @@ extern "C" void x86_interrupt_fault_handler(registers_t * r) {
 }
 
 extern "C" void x86_interrupt_irq_handler(registers_t * r) {
+
+	if(!interruptDispatch.Dispatch(r)) {
+		kLog.Warning("int dispatch","Unhandled IRQ %d!", r->int_no);
+	}
+
     // Inform slave
     if (r->int_no >= 40) {
         outb(0xA0, 0x20);

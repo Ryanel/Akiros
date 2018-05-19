@@ -1,7 +1,7 @@
 # Configuration settings
 ARCH := x86
 BOARD := i686
-KERNEL_OUTPUT 	:= kernel
+KERNEL_OUTPUT 	:= kernel.elf
 OUTPUT_DIRECTORY := ../../build/
 
 # Tools
@@ -23,7 +23,8 @@ LD_LINKER_SCRIPT := ${ARCH}/${BOARD}/link.ld
 # Files
 FILES_KERNEL 	 := $(patsubst %.cpp,%.o,$(wildcard *.cpp))
 FILES_LIB    	 := $(patsubst %.cpp,%.o,$(wildcard lib/*.cpp))
-FILES_ARCH   	 := $(patsubst %.cpp,%.o,$(wildcard ${ARCH}/*.cpp)) $(patsubst %.asm,%.o,$(wildcard ${ARCH}/*.asm))
+FILES_ARCH_DRV   := $(patsubst %.cpp,%.o,$(wildcard ${ARCH}/drivers/*.cpp))
+FILES_ARCH   	 := $(patsubst %.cpp,%.o,$(wildcard ${ARCH}/*.cpp)) $(patsubst %.asm,%.o,$(wildcard ${ARCH}/*.asm)) ${FILES_ARCH_DRV}
 FILES_BOARD  	 := $(patsubst %.cpp,%.o,$(wildcard ${ARCH}/${BOARD}/*.cpp)) $(patsubst %.asm,%.o,$(wildcard ${ARCH}/${BOARD}/*.asm))
 
 CRTBEGIN_OBJ     :=$(shell $(CXX) $(CXXFLAGS) -print-file-name=crtbegin.o)

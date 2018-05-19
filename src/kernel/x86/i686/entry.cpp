@@ -11,10 +11,13 @@
 #include <x86/idt.hpp>
 #include <x86/interrupts.hpp>
 
+#include <x86/drivers/pit.hpp>
+
 using namespace Kernel;
 using namespace x86;
 
 IDT idt;
+x86::Drivers::PIT pit;
 
 /// Configure the kernel
 void kConfigureKernel() {
@@ -27,6 +30,7 @@ void kInitHardware() {
     kLog.Info("kernel", "Initialising hardware");
 
     idt.Setup();
+    pit.Init();
     x86::EnableInterrupts(true);
 
     kLog.Info("kernel", "Initialised hardware");
