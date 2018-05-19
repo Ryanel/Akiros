@@ -122,6 +122,7 @@ irq_common_stub:
 
     setupSegment
 
+    mov eax, esp
     push eax
     mov eax, x86_interrupt_irq_handler
     call eax

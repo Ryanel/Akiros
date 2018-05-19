@@ -7,7 +7,7 @@ run:
 	$(MAKE) -C src/kernel run
 
 run-debugger:
-	@qemu-system-i386 -s -S -m 48M -kernel build/kernel
+	@qemu-system-i386 -s -S -m 48M -kernel build/kernel.elf
 
 clean:
 	$(MAKE) -C src/kernel clean
