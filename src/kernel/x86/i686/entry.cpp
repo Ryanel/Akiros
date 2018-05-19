@@ -2,6 +2,8 @@
 
 #include <kernel.hpp>
 #include <console/console.hpp>
+#include <timer.hpp>
+#include <timing.hpp>
 
 #include <multiboot.hpp>
 #include <klog.hpp>
@@ -31,6 +33,7 @@ void kInitHardware() {
 
     idt.Setup();
     pit.Init();
+    timing.SetTimer(&pit);
     x86::EnableInterrupts(true);
 
     kLog.Info("kernel", "Initialised hardware");

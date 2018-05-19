@@ -11,21 +11,21 @@ SECTIONS {
         *(.text*)
     }
 
-    .rodata ALIGN (0x1000) : AT(ADDR(.rodata) - KERNEL_VMA) {
+    .rodata : AT(ADDR(.rodata) - KERNEL_VMA) {
         *(.rodata*)
     }
 
-    .data ALIGN (0x1000) : AT(ADDR(.data) - KERNEL_VMA) {
+    .data : AT(ADDR(.data) - KERNEL_VMA) {
         *(.data)
     }
 
-    .eh_frame ALIGN (0x1000) : AT(ADDR(.eh_frame) - KERNEL_VMA)
+    .eh_frame : AT(ADDR(.eh_frame) - KERNEL_VMA)
     {
         _ehframe = .;
         *(.eh_frame)
     }
 
-    .bss ALIGN (0x1000) : AT(ADDR(.bss) - KERNEL_VMA) {
+    .bss : AT(ADDR(.bss) - KERNEL_VMA) {
         _sbss = .;
         *(COMMON)
         *(.bss)

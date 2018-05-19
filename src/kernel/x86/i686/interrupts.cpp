@@ -71,9 +71,8 @@ extern "C" void x86_interrupt_fault_handler(registers_t * r) {
 }
 
 extern "C" void x86_interrupt_irq_handler(registers_t * r) {
-
 	if(!interruptDispatch.Dispatch(r)) {
-		kLog.Warning("int dispatch","Unhandled IRQ %d!", r->int_no);
+		kLog.Warning("irq","Unhandled IRQ %d!", r->int_no - 32);
 	}
 
     // Inform slave
